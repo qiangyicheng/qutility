@@ -1,32 +1,24 @@
 ﻿// qutility.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-// qutility.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
 
 #include <iostream>
-
 #include "qutility.h"
 
+// traits.h 例子
 struct Test1 { template <typename T> using apply = std::is_integral<T>; };
 struct Test2 { template <typename T> using apply = std::is_pointer<T>; };
+void example_traits_00() {
+	using qutility::traits::is_correct_list_of_n;
+	constexpr bool test1 = is_correct_list_of_n<2, Test1, Test2, size_t, double*, int, void*>::value;
+	std::cout <<
+		"<size_t, double*, int, void*> "
+		"is a proper sequence of integral_type, pointer_type, integral_type, pointer_type ..." << std::endl;
+}
+
 
 int main()
 {
 	std::cout << "Hello World!\n";
-
-	using T = qutility::traits::first_n<3, double, int, double, int, float>::type;
-	using T1 = qutility::traits::rest_n<3, double, int, double, int, float>::type;
-
-	double test[1000];
-
-	using qutility::history::History;
-	using HistoryT = History<double, 10, 10>;
-	HistoryT hist(test);
-
-	hist.at(0)[0] = 1;
-
-	constexpr static bool value = qutility::traits::is_correct_list_of_n<2, Test2, Test1, double*, int, int*, size_t>::value;
-
-
+	example_traits_00();
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
