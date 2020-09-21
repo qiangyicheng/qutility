@@ -9,6 +9,8 @@
 namespace qutility {
 	namespace array_wrapper {
 
+		class ArrayCPUBase { };
+
 		template <class T, std::size_t S, std::size_t A = 64>
 		class ArrayDDR {
 		public:
@@ -48,7 +50,7 @@ namespace qutility {
 		};
 
 		template <class T, std::size_t A = 64>
-		class DArrayDDR {
+		class DArrayDDR : ArrayCPUBase {
 		public:
 			DArrayDDR() = delete;
 			DArrayDDR(std::size_t S) : data_(S, T()), size_(S), pointer_(&(data_.at(0))) {	}
@@ -72,7 +74,7 @@ namespace qutility {
 		};
 
 		template <class T, std::size_t A = 64>
-		class DArrayHBW {
+		class DArrayHBW : ArrayCPUBase {
 		public:
 			DArrayHBW() = delete;
 			DArrayHBW(std::size_t S) : data_(S, T()), size_(S), pointer_(&(data_.at(0))) { }
