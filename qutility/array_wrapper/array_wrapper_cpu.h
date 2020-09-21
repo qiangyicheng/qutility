@@ -77,6 +77,11 @@ namespace qutility {
 			DArrayHBW() = delete;
 			DArrayHBW(std::size_t S) : data_(S, T()), size_(S), pointer_(&(data_.at(0))) { }
 			DArrayHBW(const T& val, std::size_t S) : data_(S, val), size_(S), pointer_(&(data_.at(0))) { }
+			operator T* () { return pointer_; }
+			operator const T* () const { return pointer_; }
+			T* operator+(size_t shift) { return pointer_ + shift; }
+			const T* operator+(size_t shift) const { return pointer_ + shift; }
+
 
 			const std::size_t size_;
 			constexpr static std::size_t Alignment = A;
