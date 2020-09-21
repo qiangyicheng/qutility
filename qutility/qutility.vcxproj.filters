@@ -65,5 +65,11 @@
     <ClInclude Include="array_wrapper\array_wrapper_cpu.h">
       <Filter>头文件\array_wrapper</Filter>
     </ClInclude>
+    <ClInclude Include="history.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="array_wrapper\detail.h">
+      <Filter>头文件\array_wrapper</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

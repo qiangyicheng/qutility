@@ -147,6 +147,7 @@
     <ClInclude Include="array_wrapper.h" />
     <ClInclude Include="array_wrapper\array_wrapper_cpu.h" />
     <ClInclude Include="array_wrapper\array_wrapper_gpu.h" />
+    <ClInclude Include="array_wrapper\detail.h" />
     <ClInclude Include="array_wrapper\hbw_debug_win.h" />
     <ClInclude Include="array_wrapper\hbw_posix_allocator.h" />
     <ClInclude Include="crtp_helper.h" />
