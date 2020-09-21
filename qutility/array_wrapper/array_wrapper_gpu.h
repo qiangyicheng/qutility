@@ -9,7 +9,7 @@
 namespace qutility {
 	namespace array_wrapper {
 
-		class ArrayGPUBase{};
+		class ArrayGPUBase {};
 
 		class ArrayGPUSelectDevice : ArrayGPUBase {
 		public:
@@ -60,34 +60,22 @@ namespace qutility {
 		};
 
 		template <class T, std::size_t A = 64>
-		class DArrayDDRPinned {
+		class DArrayDDRPinned : public DArrayDDR<T, A> {
 		public:
 			DArrayDDRPinned() = delete;
-			DArrayDDRPinned(std::size_t S) :size_(S), data_(S, T()), pointer_(&(data_.at(0))) {
+			DArrayDDRPinned(std::size_t S) :DArrayDDR<T, A>(S) {
 				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
 			}
-			DArrayDDRPinned(const T& val, std::size_t S) :size_(S), data_(S, val), pointer_(&(data_.at(0))) {
+			DArrayDDRPinned(const T& val, std::size_t S) :DArrayDDR<T, A>(val, S) {
+				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
+			}
+			template<typename OtherT, typename OtherAlloc>
+			DArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : DArrayDDR<T, A>(v, S) {
 				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
 			}
 			~DArrayDDRPinned() {
 				cudaHostUnregister((void*)pointer_);
 			}
-			operator T* () { return pointer_; }
-			operator const T* () const { return pointer_; }
-			T* operator+(size_t shift) { return pointer_ + shift; }
-			const T* operator+(size_t shift) const { return pointer_ + shift; }
-
-			const std::size_t size_;
-			constexpr static std::size_t Alignment = A;
-
-			inline const T* pointer() const { return &(data_.at(0)); }
-			inline T* pointer() { return &(data_.at(0)); }
-			inline const T& operator[](size_t pos) const { return data_[pos]; }
-			inline T& operator[](size_t pos) { return data_[pos]; }
-
-		private:
-			std::vector<T, boost::alignment::aligned_allocator<T, Alignment>> data_;
-			T* const pointer_;
 		};
 
 		template <class T, std::size_t S, std::size_t A = 64>
@@ -95,6 +83,10 @@ namespace qutility {
 		public:
 			ArrayDDRPinned() : DArrayDDRPinned<T, A>(S) {}
 			ArrayDDRPinned(const T& val) : DArrayDDRPinned<T, A>(val, S) {}
+			template<typename OtherT, typename OtherAlloc>
+			ArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v) : DArrayDDRPinned<T, A>(v, S) {
+				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
+			}
 			~ArrayDDRPinned() {	}
 
 			constexpr static std::size_t Size = S;
