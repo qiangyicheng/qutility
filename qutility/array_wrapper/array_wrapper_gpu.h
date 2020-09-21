@@ -15,27 +15,27 @@ namespace qutility {
 				return v_dup;
 			}
 		}
-		class ArrayDeviceSelect {
+		class ArrayGPUBase {
 		public:
-			ArrayDeviceSelect() = delete;
-			ArrayDeviceSelect(const ArrayDeviceSelect&) = delete;
-			ArrayDeviceSelect(ArrayDeviceSelect&&) = delete;
-			ArrayDeviceSelect& operator=(const ArrayDeviceSelect&) = delete;
-			ArrayDeviceSelect(int device) :device_(device) { cudaSetDevice(device); }
-			~ArrayDeviceSelect() { }
+			ArrayGPUBase() = delete;
+			ArrayGPUBase(const ArrayGPUBase&) = delete;
+			ArrayGPUBase(ArrayGPUBase&&) = delete;
+			ArrayGPUBase& operator=(const ArrayGPUBase&) = delete;
+			ArrayGPUBase(int device) :device_(device) { cudaSetDevice(device); }
+			~ArrayGPUBase() { }
 			const int device_;
 		};
 
 		//Allocate memory in GPU
 		//Note that it is done through a thrust interface.
 		template <class T, std::size_t S>
-		class ArrayGPU :public ArrayDeviceSelect {
+		class ArrayGPU :public ArrayGPUBase {
 		public:
 			ArrayGPU() = delete;
-			ArrayGPU(int device) : ArrayDeviceSelect(device), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
-			ArrayGPU(const T& val, int device) : ArrayDeviceSelect(device), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			ArrayGPU(int device) : ArrayGPUBase(device), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			ArrayGPU(const T& val, int device) : ArrayGPUBase(device), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			template<typename OtherT, typename OtherAlloc>
-			ArrayGPU(const std::vector<OtherT, OtherAlloc>& v, int device) : ArrayDeviceSelect(device), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			ArrayGPU(const std::vector<OtherT, OtherAlloc>& v, int device) : ArrayGPUBase(device), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			operator T* () { return pointer_; }
 			operator const T* () const { return pointer_; }
 			T* operator+(size_t shift) { return pointer_ + shift; }
@@ -87,13 +87,13 @@ namespace qutility {
 		//Allocate memory in GPU
 		//Note that it is done through a thrust interface.
 		template <class T>
-		class DArrayGPU :public ArrayDeviceSelect {
+		class DArrayGPU :public ArrayGPUBase {
 		public:
 			DArrayGPU() = delete;
-			DArrayGPU(std::size_t S, int device) : ArrayDeviceSelect(device), size_(S), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
-			DArrayGPU(const T& val, std::size_t S, int device) : ArrayDeviceSelect(device), size_(S), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(const T& val, std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			template<typename OtherT, typename OtherAlloc>
-			DArrayGPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S, int device) : ArrayDeviceSelect(device), size_(S), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			operator T* () { return pointer_; }
 			operator const T* () const { return pointer_; }
 			T* operator+(size_t shift) { return pointer_ + shift; }
