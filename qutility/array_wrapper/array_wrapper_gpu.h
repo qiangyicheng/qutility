@@ -42,7 +42,7 @@ namespace qutility {
 			inline const auto operator[](size_t pos) const { return data_[pos]; }
 			inline auto operator[](size_t pos) { return data_[pos]; }
 
-		private:
+		protected:
 			thrust::device_vector<T> data_;
 			T* const pointer_;
 		};
@@ -76,6 +76,9 @@ namespace qutility {
 			~DArrayDDRPinned() {
 				cudaHostUnregister((void*)pointer_);
 			}
+			using DArrayDDR<T, A>::size_;
+		protected:
+			using DArrayDDR<T, A>::pointer_;
 		};
 
 		template <class T, std::size_t S, std::size_t A = 64>
@@ -84,9 +87,7 @@ namespace qutility {
 			ArrayDDRPinned() : DArrayDDRPinned<T, A>(S) {}
 			ArrayDDRPinned(const T& val) : DArrayDDRPinned<T, A>(val, S) {}
 			template<typename OtherT, typename OtherAlloc>
-			ArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v) : DArrayDDRPinned<T, A>(v, S) {
-				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
-			}
+			ArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v) : DArrayDDRPinned<T, A>(v, S) {}
 			~ArrayDDRPinned() {	}
 
 			constexpr static std::size_t Size = S;

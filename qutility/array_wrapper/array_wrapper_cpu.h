@@ -32,16 +32,16 @@ namespace qutility {
 			inline const T& operator[](size_t pos) const { return data_[pos]; }
 			inline T& operator[](size_t pos) { return data_[pos]; }
 
-		private:
+		protected:
 			std::vector<T, Allocator> data_;
 			T* const pointer_;
 		};
 
 		template <class T, std::size_t A = 64>
-		using DArrayDDR = ArrayCPU<T, boost::alignment::aligned_allocator<T, Alignment>, A>;
+		using DArrayDDR = ArrayCPU<T, boost::alignment::aligned_allocator<T, A>, A>;
 
 		template <class T, std::size_t A = 64>
-		using DArrayHBW = ArrayCPU<T, hbw::allocator<T, Alignment>, A>;
+		using DArrayHBW = ArrayCPU<T, hbw::allocator<T, A>, A>;
 
 		template <class T, std::size_t S, std::size_t A = 64>
 		class ArrayDDR : public DArrayDDR<T, A> {
