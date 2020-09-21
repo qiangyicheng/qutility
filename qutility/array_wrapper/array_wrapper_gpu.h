@@ -8,27 +8,30 @@
 
 namespace qutility {
 	namespace array_wrapper {
-		class ArrayGPUBase {
+
+		class ArrayGPUBase{};
+
+		class ArrayGPUSelectDevice : ArrayGPUBase {
 		public:
-			ArrayGPUBase() = delete;
-			ArrayGPUBase(const ArrayGPUBase&) = delete;
-			ArrayGPUBase(ArrayGPUBase&&) = delete;
-			ArrayGPUBase& operator=(const ArrayGPUBase&) = delete;
-			ArrayGPUBase(int device) :device_(device) { cudaSetDevice(device); }
-			~ArrayGPUBase() { }
+			ArrayGPUSelectDevice() = delete;
+			ArrayGPUSelectDevice(const ArrayGPUSelectDevice&) = delete;
+			ArrayGPUSelectDevice(ArrayGPUSelectDevice&&) = delete;
+			ArrayGPUSelectDevice& operator=(const ArrayGPUSelectDevice&) = delete;
+			ArrayGPUSelectDevice(int device) :device_(device) { cudaSetDevice(device); }
+			~ArrayGPUSelectDevice() { }
 			const int device_;
 		};
 
 		//Allocate memory in GPU
 		//Note that it is done through a thrust interface.
 		template <class T>
-		class DArrayGPU :public ArrayGPUBase {
+		class DArrayGPU :public ArrayGPUSelectDevice {
 		public:
 			DArrayGPU() = delete;
-			DArrayGPU(std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
-			DArrayGPU(const T& val, std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(std::size_t S, int device) : ArrayGPUSelectDevice(device), size_(S), data_(S, T()), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(const T& val, std::size_t S, int device) : ArrayGPUSelectDevice(device), size_(S), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			template<typename OtherT, typename OtherAlloc>
-			DArrayGPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S, int device) : ArrayGPUBase(device), size_(S), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S, int device) : ArrayGPUSelectDevice(device), size_(S), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			operator T* () { return pointer_; }
 			operator const T* () const { return pointer_; }
 			T* operator+(size_t shift) { return pointer_ + shift; }
