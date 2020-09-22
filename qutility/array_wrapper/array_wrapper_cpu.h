@@ -19,6 +19,19 @@ namespace qutility {
 			ArrayCPU(const T& val, std::size_t S) : data_(S, val), size_(S), pointer_(&(data_.at(0))) {	}
 			template<typename OtherT, typename OtherAlloc>
 			ArrayCPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : data_(detail::duplicate(v, S)), size_(S), pointer_(&(data_.at(0))) {}
+			ArrayCPU(const ArrayCPU& rhs) : data_(rhs.data_), size_(rhs.size_), pointer_(&(data_.at(0))) {	}
+			ArrayCPU(ArrayCPU&& rhs) : data_(std::move(rhs.data_)), size_(rhs.size_), pointer_(&(data_.at(0))) {	}
+			ArrayCPU& operator=(const ArrayCPU& rhs) {
+				if (size_ < rhs.size_) throw std::logic_error("Assignment can not be done from a larger array to a smaller one");
+				std::memcpy(pointer_, rhs.pointer(), sizeof(T) * rhs.size_);
+				return *this;
+			}
+			ArrayCPU& operator=(ArrayCPU&& rhs) {
+				if (size_ < rhs.size_) throw std::logic_error("Assignment can not be done from a larger array to a smaller one");
+				std::memcpy(pointer_, rhs.pointer(), sizeof(T) * rhs.size_);
+				return *this;
+			}
+
 			operator T* () { return pointer_; }
 			operator const T* () const { return pointer_; }
 			T* operator+(size_t shift) { return pointer_ + shift; }
@@ -50,6 +63,10 @@ namespace qutility {
 			ArrayDDR(const T& val) : DArrayDDR<T, A>(val, S) {	}
 			template<typename OtherT, typename OtherAlloc>
 			ArrayDDR(const std::vector<OtherT, OtherAlloc>& v) : DArrayDDR<T, A>(v, S) {}
+			ArrayDDR(const ArrayDDR&) = default;
+			ArrayDDR(ArrayDDR&&) = default;
+			ArrayDDR& operator=(const ArrayDDR&) = default;
+			ArrayDDR& operator=(ArrayDDR&&) = default;
 
 			constexpr static std::size_t Size = S;
 		};
@@ -61,6 +78,10 @@ namespace qutility {
 			ArrayHBW(const T& val) : DArrayHBW<T, A>(val, S) { }
 			template<typename OtherT, typename OtherAlloc>
 			ArrayHBW(const std::vector<OtherT, OtherAlloc>& v) : DArrayHBW<T, A>(v, S) {}
+			ArrayHBW(const ArrayHBW&) = default;
+			ArrayHBW(ArrayHBW&&) = default;
+			ArrayHBW& operator=(const ArrayHBW&) = default;
+			ArrayHBW& operator=(ArrayHBW&&) = default;
 
 			constexpr static std::size_t Size = S;
 		};

@@ -100,6 +100,10 @@ namespace qutility {
 			DArrayDDRPinned(const T& val, std::size_t S) :DArrayDDR<T, A>(val, S) { register_host_memory(); }
 			template<typename OtherT, typename OtherAlloc>
 			DArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : DArrayDDR<T, A>(v, S) { register_host_memory(); }
+			DArrayDDRPinned(const DArrayDDRPinned& rhs) : DArrayDDR<T, A>(rhs) { register_host_memory(); }
+			DArrayDDRPinned(DArrayDDRPinned&& rhs) : DArrayDDR<T, A>(rhs) { register_host_memory(); }
+			DArrayDDRPinned& operator=(const DArrayDDRPinned&) = default;
+			DArrayDDRPinned& operator=(DArrayDDRPinned&&) = default;
 			~DArrayDDRPinned() { unregister_host_memory(); }
 			using DArrayDDR<T, A>::size_;
 		protected:
