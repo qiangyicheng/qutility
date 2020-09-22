@@ -2,7 +2,9 @@
 
 #include <cstdio>
 #include <vector>
+#include <stdexcept>
 #include "cuda_runtime.h"
+#include "helper_cuda.h"
 #include "thrust/device_vector.h"
 #include "detail.h"
 
@@ -14,10 +16,17 @@ namespace qutility {
 		class ArrayGPUSelectDevice : ArrayGPUBase {
 		public:
 			ArrayGPUSelectDevice() = delete;
-			ArrayGPUSelectDevice(const ArrayGPUSelectDevice&) = delete;
-			ArrayGPUSelectDevice(ArrayGPUSelectDevice&&) = delete;
-			ArrayGPUSelectDevice& operator=(const ArrayGPUSelectDevice&) = delete;
-			ArrayGPUSelectDevice(int device) :device_(device) { cudaSetDevice(device); }
+			ArrayGPUSelectDevice(const ArrayGPUSelectDevice& rhs) : device_(rhs.device_) { checkCudaErrors(cudaSetDevice(device_)); }
+			ArrayGPUSelectDevice(ArrayGPUSelectDevice&& rhs) : device_(rhs.device_) { checkCudaErrors(cudaSetDevice(device_)); }
+			ArrayGPUSelectDevice& operator=(const ArrayGPUSelectDevice& rhs) {
+				if (device_ != rhs.device_)	throw std::logic_error("Assignment can not be done between two different devices");
+				checkCudaErrors(cudaSetDevice(device_));
+			}
+			ArrayGPUSelectDevice& operator=(ArrayGPUSelectDevice&& rhs) {
+				if (device_ != rhs.device_)	throw std::logic_error("Assignment can not be done between two different devices");
+				checkCudaErrors(cudaSetDevice(device_));
+			}
+			ArrayGPUSelectDevice(int device) :device_(device) { checkCudaErrors(cudaSetDevice(device_)); }
 			~ArrayGPUSelectDevice() { }
 			const int device_;
 		};
@@ -63,22 +72,17 @@ namespace qutility {
 		class DArrayDDRPinned : public DArrayDDR<T, A> {
 		public:
 			DArrayDDRPinned() = delete;
-			DArrayDDRPinned(std::size_t S) :DArrayDDR<T, A>(S) {
-				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
-			}
-			DArrayDDRPinned(const T& val, std::size_t S) :DArrayDDR<T, A>(val, S) {
-				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
-			}
+			DArrayDDRPinned(std::size_t S) :DArrayDDR<T, A>(S) { register_host_memory(); }
+			DArrayDDRPinned(const T& val, std::size_t S) :DArrayDDR<T, A>(val, S) { register_host_memory(); }
 			template<typename OtherT, typename OtherAlloc>
-			DArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : DArrayDDR<T, A>(v, S) {
-				cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault);
-			}
-			~DArrayDDRPinned() {
-				cudaHostUnregister((void*)pointer_);
-			}
+			DArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : DArrayDDR<T, A>(v, S) { register_host_memory(); }
+			~DArrayDDRPinned() { unregister_host_memory(); }
 			using DArrayDDR<T, A>::size_;
 		protected:
 			using DArrayDDR<T, A>::pointer_;
+		private:
+			void register_host_memory() { checkCudaErrors(cudaHostRegister((void*)pointer_, size_ * sizeof(T), cudaHostRegisterDefault)); }
+			void unregister_host_memory() { checkCudaErrors(cudaHostUnregister((void*)pointer_)); }
 		};
 
 		template <class T, std::size_t S, std::size_t A = 64>
