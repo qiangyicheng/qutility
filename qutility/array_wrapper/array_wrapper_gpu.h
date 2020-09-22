@@ -92,7 +92,7 @@ namespace qutility {
 			ArrayDDRPinned(const T& val) : DArrayDDRPinned<T, A>(val, S) {}
 			template<typename OtherT, typename OtherAlloc>
 			ArrayDDRPinned(const std::vector<OtherT, OtherAlloc>& v) : DArrayDDRPinned<T, A>(v, S) {}
-			~ArrayDDRPinned() {	}
+			~ArrayDDRPinned() = default;
 
 			constexpr static std::size_t Size = S;
 		};
