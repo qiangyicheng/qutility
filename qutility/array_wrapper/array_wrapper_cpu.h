@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <cstdio>
+#include <cstring>
+#include <stdexcept>
 #include <vector>
 #include "boost/align.hpp"
 #include "detail.h"
