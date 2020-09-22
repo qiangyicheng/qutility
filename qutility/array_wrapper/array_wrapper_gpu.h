@@ -125,6 +125,29 @@ namespace qutility {
 			constexpr static std::size_t Size = S;
 		};
 
+		template<
+			class DstArrayT, class SrcArrayT,
+			class = std::enable_if_t<
+				(std::is_base_of<ArrayCPUBase, DstArrayT>::value || std::is_base_of<ArrayGPUBase, DstArrayT>::value) &&
+				(std::is_base_of<ArrayCPUBase, SrcArrayT>::value || std::is_base_of<ArrayGPUBase, SrcArrayT>::value) &&
+				std::is_same<
+					std::decay_t<std::remove_pointer_t< decltype(std::declval<SrcArrayT>().pointer())>>,
+					std::decay_t<std::remove_pointer_t< decltype(std::declval<DstArrayT>().pointer())>>
+				>::value
+			>
+		>
+			void array_copy(DstArrayT& dst, const SrcArrayT& src, size_t shift = 0) {
+			using ValTy = std::decay_t<std::remove_pointer_t< decltype(std::declval<SrcArrayT>().pointer())>>;
+			if (dst.size_ < (src.size_ + shift)) throw std::logic_error("array_copy can not be done from a larger array to a smaller one");
+			if constexpr (std::is_base_of<ArrayCPUBase, DstArrayT>::value && std::is_base_of<ArrayCPUBase, SrcArrayT>::value)
+				std::memcpy(dst.pointer(), src.pointer(), sizeof(ValTy) * src.size_);
+			else if constexpr (std::is_base_of<ArrayGPUBase, DstArrayT>::value && std::is_base_of<ArrayGPUBase, SrcArrayT>::value)
+				checkCudaErrors(cudaMemcpy(dst.pointer(), src.pointer(), sizeof(ValTy) * src.size_, cudaMemcpyDeviceToDevice));
+			else if constexpr (std::is_base_of<ArrayCPUBase, DstArrayT>::value && std::is_base_of<ArrayGPUBase, SrcArrayT>::value)
+				checkCudaErrors(cudaMemcpy(dst.pointer(), src.pointer(), sizeof(ValTy) * src.size_, cudaMemcpyDeviceToHost));
+			else if constexpr (std::is_base_of<ArrayGPUBase, DstArrayT>::value && std::is_base_of<ArrayCPUBase, SrcArrayT>::value)
+				checkCudaErrors(cudaMemcpy(dst.pointer(), src.pointer(), sizeof(ValTy) * src.size_, cudaMemcpyHostToDevice));
+		}
 	}
 }
 
