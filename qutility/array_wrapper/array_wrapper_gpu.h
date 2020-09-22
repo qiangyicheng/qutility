@@ -21,10 +21,12 @@ namespace qutility {
 			ArrayGPUSelectDevice& operator=(const ArrayGPUSelectDevice& rhs) {
 				if (device_ != rhs.device_)	throw std::logic_error("Assignment can not be done between two different devices");
 				checkCudaErrors(cudaSetDevice(device_));
+				return *this;
 			}
 			ArrayGPUSelectDevice& operator=(ArrayGPUSelectDevice&& rhs) {
 				if (device_ != rhs.device_)	throw std::logic_error("Assignment can not be done between two different devices");
 				checkCudaErrors(cudaSetDevice(device_));
+				return *this;
 			}
 			ArrayGPUSelectDevice(int device) :device_(device) { checkCudaErrors(cudaSetDevice(device_)); }
 			~ArrayGPUSelectDevice() { }
@@ -41,11 +43,29 @@ namespace qutility {
 			DArrayGPU(const T& val, std::size_t S, int device) : ArrayGPUSelectDevice(device), size_(S), data_(S, val), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
 			template<typename OtherT, typename OtherAlloc>
 			DArrayGPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S, int device) : ArrayGPUSelectDevice(device), size_(S), data_(detail::duplicate(v, S)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(const DArrayGPU& rhs) :ArrayGPUSelectDevice(rhs), size_(rhs.size_), data_(rhs.data_), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU(DArrayGPU&& rhs) :ArrayGPUSelectDevice(rhs), size_(rhs.size_), data_(std::move(rhs.data_)), pointer_(thrust::raw_pointer_cast(&(data_[0]))) {}
+			DArrayGPU& operator=(const DArrayGPU& rhs) {
+				ArrayGPUSelectDevice::operator=(rhs);
+				if (size_ < rhs.size_) throw std::logic_error("Assignment can not be done from a larger array to a smaller one");
+				checkCudaErrors(cudaMemcpy(pointer_, rhs.pointer(), sizeof(T) * rhs.size_, cudaMemcpyDeviceToDevice));
+				return *this;
+			}
+			DArrayGPU& operator=(DArrayGPU&& rhs) {
+				ArrayGPUSelectDevice::operator=(rhs);
+				if (size_ < rhs.size_) throw std::logic_error("Assignment can not be done from a larger array to a smaller one");
+				checkCudaErrors(cudaMemcpy(pointer_, rhs.pointer(), sizeof(T) * rhs.size_, cudaMemcpyDeviceToDevice));
+				return *this;
+			}
+
+
 			operator T* () { return pointer_; }
 			operator const T* () const { return pointer_; }
 			T* operator+(size_t shift) { return pointer_ + shift; }
 			const T* operator+(size_t shift) const { return pointer_ + shift; }
+
 			const std::size_t size_;
+
 			const T* pointer() const { return pointer_; }
 			T* pointer() { return pointer_; }
 			inline const auto operator[](size_t pos) const { return data_[pos]; }
@@ -64,6 +84,10 @@ namespace qutility {
 			ArrayGPU(const T& val, int device) : DArrayGPU<T>(val, S, device) {}
 			template<typename OtherT, typename OtherAlloc>
 			ArrayGPU(const std::vector<OtherT, OtherAlloc>& v, int device) : DArrayGPU<T>(v, S, device) {}
+			ArrayGPU(const ArrayGPU&) = default;
+			ArrayGPU(ArrayGPU&&) = default;
+			ArrayGPU& operator=(const ArrayGPU&) = default;
+			ArrayGPU& operator=(ArrayGPU&&) = default;
 
 			constexpr static std::size_t Size = S;
 		};
