@@ -117,6 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.0\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.0\include;C:\vcpkg\installed\x64-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +133,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.0\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.0\include;C:\vcpkg\installed\x64-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +154,7 @@
     <ClInclude Include="array_wrapper\hbw_posix_allocator.h" />
     <ClInclude Include="crtp_helper.h" />
     <ClInclude Include="c_array.h" />
+    <ClInclude Include="getopt.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="ifmember.h" />
     <ClInclude Include="matio.h" />

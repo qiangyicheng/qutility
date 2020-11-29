@@ -71,5 +71,8 @@
     <ClInclude Include="array_wrapper\detail.h">
       <Filter>头文件\array_wrapper</Filter>
     </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
