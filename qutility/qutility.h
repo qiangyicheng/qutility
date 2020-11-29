@@ -8,3 +8,4 @@
 #include "ifmember.h"
 #include "array_wrapper.h"
 #include "history.h"
+#include "getopt.h"
