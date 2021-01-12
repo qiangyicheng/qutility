@@ -83,6 +83,8 @@ namespace qutility {
 			[[nodiscard]] auto clatter() const noexcept { return detail::clatter(base_ptr_, single_size_, N_hist_, N_record_); }
 			[[nodiscard]] auto at(intptr_t const& pos) const { return detail::at(base_ptr_, single_size_, N_hist_, N_record_, pos); }
 			[[nodiscard]] auto cat(intptr_t const& pos) const { return detail::cat(base_ptr_, single_size_, N_hist_, N_record_, pos); }
+			[[nodiscard]] auto single_size() const { return single_size_; }
+			[[nodiscard]] auto N_hist() const { return N_hist_; }
 
 		protected:
 			T* const base_ptr_;
@@ -103,6 +105,8 @@ namespace qutility {
 			History(T* const& base_ptr) : HistoryBase<T>(base_ptr, SingleSize, NHist) {}
 			constexpr static size_t single_size_ = SingleSize;
 			constexpr static size_t N_hist_ = NHist;
+			[[nodiscard]] constexpr auto single_size() const { return single_size_; }
+			[[nodiscard]] constexpr auto N_hist() const { return N_hist_; }
 		};
 
 		template<typename T>
