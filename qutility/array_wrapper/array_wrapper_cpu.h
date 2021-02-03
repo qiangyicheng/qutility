@@ -20,7 +20,10 @@ namespace qutility {
 			ArrayCPU(std::size_t S) : data_(S, T()), size_(S), pointer_(&(data_.at(0))) {	}
 			ArrayCPU(const T& val, std::size_t S) : data_(S, val), size_(S), pointer_(&(data_.at(0))) {	}
 			template<typename OtherT, typename OtherAlloc>
-			ArrayCPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : data_(detail::duplicate(v, S)), size_(S), pointer_(&(data_.at(0))) {}
+			ArrayCPU(const std::vector<OtherT, OtherAlloc>& v, std::size_t S) : size_(S), pointer_(&(data_.at(0))) {
+				auto vec = detail::duplicate(v, S);
+				data_ = std::vector<T, Allocator>(vec.cbegin(), vec.cend());
+			}
 			ArrayCPU(const ArrayCPU& rhs) : data_(rhs.data_), size_(rhs.size_), pointer_(&(data_.at(0))) {	}
 			ArrayCPU(ArrayCPU&& rhs) : data_(std::move(rhs.data_)), size_(rhs.size_), pointer_(&(data_.at(0))) {	}
 			ArrayCPU& operator=(const ArrayCPU& rhs) {
