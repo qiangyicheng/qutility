@@ -11,6 +11,13 @@ namespace qutility {
 				v_dup.resize(size);
 				return v_dup;
 			}
+
+			template<typename T1, typename Alloc1, typename T2, typename Alloc2>
+			std::vector<T1, Alloc1> duplicate(const std::vector<T2, Alloc2>& v, size_t size) {
+				auto v_dup = v;
+				v_dup.resize(size);
+				return std::vector<T1, Alloc1>(v_dup.cbegin(), v_dup.cend());
+			}
 		}
 	}
 }
