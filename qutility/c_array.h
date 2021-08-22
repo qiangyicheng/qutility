@@ -144,5 +144,16 @@ namespace qutility {
 			constexpr static c_array<T, N + 1> apply(c_array<T, N> const& p) { return append(p, e); }
 		};
 
+
+		template<class T, class U, size_t N>
+		constexpr decltype(std::declval<T>()+ std::declval<U>()) inner_product(c_array<T, N> const& a, c_array<U, N> const& b)
+		{
+			using AnsT = decltype(std::declval<T>() + std::declval<U>());
+			AnsT ans = AnsT{};
+			for (size_t itr = 0; itr < N; ++itr) {
+				ans += a[itr] * b[itr];
+			}
+			return ans;
+		}
 	}
 }

@@ -18,6 +18,19 @@ namespace qutility {
 			static constexpr bool value = std::is_convertible<Last, EleType>::value;
 		};
 
+		template <bool, typename First, typename Second>
+		struct static_if;
+
+		template <typename First, typename Second>
+		struct static_if<true, First, Second> {
+			using type = First;
+		};
+
+		template <typename First, typename Second>
+		struct static_if<false, First, Second> {
+			using type = Second;
+		};
+
 		template <size_t pos, typename ... Args>
 		struct static_switch;
 
