@@ -37,6 +37,11 @@ namespace qutility {
 			return true;
 		}
 
+		template<class T1, class T2, size_t N1, size_t N2, typename = typename std::enable_if_t<(!std::is_same_v<T1,T2>)||(N1!=N2)>>
+		constexpr bool operator==(c_array<T1, N1> const& lhs, c_array<T2, N2> const& rhs) {
+			return false;
+		}
+
 		template<class T>
 		struct c_array<T, 0> {};
 
