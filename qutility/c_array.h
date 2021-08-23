@@ -29,6 +29,14 @@ namespace qutility {
 			}
 		};
 
+		template<class T, size_t N>
+		constexpr bool operator==(c_array<T, N> const& lhs, c_array<T, N> const& rhs) {
+			for (size_t itr = 0; itr < N; ++itr) {
+				if (lhs[itr] != rhs[itr]) return false;
+			}
+			return true;
+		}
+
 		template<class T>
 		struct c_array<T, 0> {};
 
