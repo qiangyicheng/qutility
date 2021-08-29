@@ -14,6 +14,11 @@ namespace qutility {
 				return arr[p];
 			}
 
+			constexpr T & operator[](size_t p)
+			{
+				return arr[p];
+			}
+
 			constexpr T const* begin() const
 			{
 				return arr + 0;
