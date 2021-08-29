@@ -34,6 +34,14 @@ namespace qutility {
 			}
 		};
 
+		template<class T>
+		struct c_array<T, 0> {};
+
+		template<class T1, class T2, size_t N1, size_t N2>
+		constexpr bool operator==(c_array<T1, N1> const& lhs, c_array<T2, N2> const& rhs) {
+			return false;
+		}
+
 		template<class T, size_t N>
 		constexpr bool operator==(c_array<T, N> const& lhs, c_array<T, N> const& rhs) {
 			for (size_t itr = 0; itr < N; ++itr) {
@@ -42,13 +50,10 @@ namespace qutility {
 			return true;
 		}
 
-		template<class T1, class T2, size_t N1, size_t N2, typename = typename std::enable_if_t<(!std::is_same_v<T1,T2>)||(N1!=N2)>>
-		constexpr bool operator==(c_array<T1, N1> const& lhs, c_array<T2, N2> const& rhs) {
-			return false;
-		}
-
 		template<class T>
-		struct c_array<T, 0> {};
+		constexpr bool operator==(c_array<T, 0> const& lhs, c_array<T, 0> const& rhs) {
+			return true;
+		}
 
 		template<size_t... Is>
 		struct seq {};
@@ -164,11 +169,11 @@ namespace qutility {
 
 
 		template<class T, class U, size_t N>
-		constexpr decltype(std::declval<T>()+ std::declval<U>()) inner_product(c_array<T, N> const& a, c_array<U, N> const& b)
+		constexpr decltype(std::declval<T>() * std::declval<U>()) inner_product(c_array<T, N> const& a, c_array<U, N> const& b)
 		{
-			using AnsT = decltype(std::declval<T>() + std::declval<U>());
+			using AnsT = decltype(std::declval<T>() * std::declval<U>());
 			AnsT ans = AnsT{};
-			for (size_t itr = 0; itr < N; ++itr) {
+			if constexpr (N != 0) for (size_t itr = 0; itr < N; ++itr) {
 				ans += a[itr] * b[itr];
 			}
 			return ans;
@@ -177,10 +182,10 @@ namespace qutility {
 		template <typename T, size_t M, size_t N>
 		constexpr inline c_array<T, M + N> operator&&(c_array<T, M> const& lhs, c_array<T, N> const& rhs) {
 			c_array<T, M + N> ans{};
-			for (size_t itr = 0; itr < M; ++itr) {
+			if constexpr (M != 0) for (size_t itr = 0; itr < M; ++itr) {
 				ans[itr] = lhs[itr];
 			}
-			for (size_t itr = 0; itr < N; ++itr) {
+			if constexpr (N != 0) for (size_t itr = 0; itr < N; ++itr) {
 				ans[itr + M] = rhs[itr];
 			}
 			return ans;
