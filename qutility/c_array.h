@@ -173,5 +173,22 @@ namespace qutility {
 			}
 			return ans;
 		}
+
+		template <typename T, size_t M, size_t N>
+		constexpr inline c_array<T, M + N> operator&&(c_array<T, M> const& lhs, c_array<T, N> const& rhs) {
+			c_array<T, M + N> ans{};
+			for (size_t itr = 0; itr < M; ++itr) {
+				ans[itr] = lhs[itr];
+			}
+			for (size_t itr = 0; itr < N; ++itr) {
+				ans[itr + M] = rhs[itr];
+			}
+			return ans;
+		}
+
+		template <typename T, size_t... Ms>
+		constexpr inline c_array<T, (Ms + ...) > join(c_array<T, Ms> const & ... arrs) {
+			return (arrs && ...);
+		}
 	}
 }
