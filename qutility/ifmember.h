@@ -1,11 +1,73 @@
 #pragma once
 
+#include <type_traits>
+#include <functional>
+#include <utility>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cassert>
+
 namespace qutility {
 	namespace ifmember {
 		namespace detail {
 			template < class... >
 			using void_t = void;
+
+			template<class X, class Y, class Op>
+			struct op_valid_impl
+			{
+				template<class U, class L, class R>
+				static auto test(int) -> decltype(std::declval<U>()(std::declval<L>(), std::declval<R>()),
+					void(), std::true_type());
+
+				template<class U, class L, class R>
+				static auto test(...)->std::false_type;
+
+				using type = decltype(test<Op, X, Y>(0));
+
+			};
+
+			template<class X, class Y, class Op> using op_valid = typename op_valid_impl<X, Y, Op>::type;
+
+			namespace notstd {
+
+				struct left_shift {
+
+					template <class L, class R>
+					constexpr auto operator()(L&& l, R&& r) const
+						noexcept(noexcept(std::forward<L>(l) << std::forward<R>(r)))
+						-> decltype(std::forward<L>(l) << std::forward<R>(r))
+					{
+						return std::forward<L>(l) << std::forward<R>(r);
+					}
+				};
+
+				struct right_shift {
+
+					template <class L, class R>
+					constexpr auto operator()(L&& l, R&& r) const
+						noexcept(noexcept(std::forward<L>(l) >> std::forward<R>(r)))
+						-> decltype(std::forward<L>(l) >> std::forward<R>(r))
+					{
+						return std::forward<L>(l) >> std::forward<R>(r);
+					}
+				};
+
+			}
 		}
+
+		template<class X, class Y> using has_operator_equality = detail::op_valid<X, Y, std::equal_to<>>;
+		template<class X, class Y> using has_operator_inequality = detail::op_valid<X, Y, std::not_equal_to<>>;
+		template<class X, class Y> using has_operator_less_than = detail::op_valid<X, Y, std::less<>>;
+		template<class X, class Y> using has_operator_less_equal = detail::op_valid<X, Y, std::less_equal<>>;
+		template<class X, class Y> using has_operator_greater_than = detail::op_valid<X, Y, std::greater<>>;
+		template<class X, class Y> using has_operator_greater_equal = detail::op_valid<X, Y, std::greater_equal<>>;
+		template<class X, class Y> using has_operator_bit_xor = detail::op_valid<X, Y, std::bit_xor<>>;
+		template<class X, class Y> using has_operator_bit_or = detail::op_valid<X, Y, std::bit_or<>>;
+		template<class X, class Y> using has_operator_left_shift = detail::op_valid<X, Y, detail::notstd::left_shift>;
+		template<class X, class Y> using has_operator_right_shift = detail::op_valid<X, Y, detail::notstd::right_shift>;
+
 	}
 }
 
