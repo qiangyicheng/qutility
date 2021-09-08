@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <iostream>
 
 namespace qutility {
 	namespace c_array {
@@ -44,15 +45,20 @@ namespace qutility {
 
 		template<class T, size_t N>
 		constexpr bool operator==(c_array<T, N> const& lhs, c_array<T, N> const& rhs) {
-			for (size_t itr = 0; itr < N; ++itr) {
+			if constexpr (N > 0) for (size_t itr = 0; itr < N; ++itr) {
 				if (lhs[itr] != rhs[itr]) return false;
 			}
 			return true;
 		}
 
-		template<class T>
-		constexpr bool operator==(c_array<T, 0> const& lhs, c_array<T, 0> const& rhs) {
-			return true;
+		template<class T, size_t N>
+		std::ostream& operator<<(std::ostream& os, const c_array<T, N>& data) {
+			os << "{";
+			if constexpr (N > 0) for (size_t itr = 0; itr < N - 1; ++itr) {
+				os << data[itr] << ", ";
+			}
+			os << data[N - 1] << "}";
+			return os;
 		}
 
 		template<size_t... Is>
