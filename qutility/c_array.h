@@ -3,6 +3,8 @@
 #include <type_traits>
 #include <iostream>
 
+#include "ifmember.h"
+
 namespace qutility {
 	namespace c_array {
 		template<class T, size_t N>
@@ -51,7 +53,9 @@ namespace qutility {
 			return true;
 		}
 
-		template<class T, size_t N>
+		template<class T, size_t N, 
+			typename = typename std::enable_if_t<qutility::ifmember::has_operator_left_shift<std::ostream&, T>::value>
+		>
 		std::ostream& operator<<(std::ostream& os, const c_array<T, N>& data) {
 			os << "{";
 			if constexpr (N > 0) for (size_t itr = 0; itr < N - 1; ++itr) {
