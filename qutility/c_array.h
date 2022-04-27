@@ -17,7 +17,7 @@ namespace qutility {
 				return arr[p];
 			}
 
-			constexpr T & operator[](size_t p)
+			constexpr T& operator[](size_t p)
 			{
 				return arr[p];
 			}
@@ -53,10 +53,10 @@ namespace qutility {
 			return true;
 		}
 
-		template<class T, size_t N, 
+		template<class T, size_t N,
 			typename = typename std::enable_if_t<qutility::ifmember::has_operator_left_shift<std::ostream&, T>::value>
 		>
-		std::ostream& operator<<(std::ostream& os, const c_array<T, N>& data) {
+			std::ostream& operator<<(std::ostream& os, const c_array<T, N>& data) {
 			os << "{";
 			if constexpr (N > 0) for (size_t itr = 0; itr < N - 1; ++itr) {
 				os << data[itr] << ", ";
@@ -179,9 +179,9 @@ namespace qutility {
 
 
 		template<class T, class U, size_t N>
-		constexpr decltype(std::declval<T>() * std::declval<U>()) inner_product(c_array<T, N> const& a, c_array<U, N> const& b)
+		constexpr decltype(std::declval<T>()* std::declval<U>()) inner_product(c_array<T, N> const& a, c_array<U, N> const& b)
 		{
-			using AnsT = decltype(std::declval<T>() * std::declval<U>());
+			using AnsT = decltype(std::declval<T>()* std::declval<U>());
 			AnsT ans = AnsT{};
 			if constexpr (N != 0) for (size_t itr = 0; itr < N; ++itr) {
 				ans += a[itr] * b[itr];
@@ -204,6 +204,15 @@ namespace qutility {
 		template <typename T, size_t... Ms>
 		constexpr inline c_array<T, (Ms + ...) > join(c_array<T, Ms> const & ... arrs) {
 			return (arrs && ...);
+		}
+
+		template <typename T, size_t M>
+		constexpr inline T maximum(c_array<T, M> const& arr) {
+			T ans = std::numeric_limits<T>::lowest();
+			for (size_t itr = 0; itr < M; ++itr) {
+				ans = ans > arr[itr] ? ans : arr[itr];
+			}
+			return ans;
 		}
 	}
 }
