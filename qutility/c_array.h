@@ -217,7 +217,7 @@ namespace qutility {
 
 		template <size_t N, typename T, size_t M>
 		constexpr inline c_array<T, N> add_padding(c_array<T, M> const& arr) {
-			c_array<T, N> ans;
+			c_array<T, N> ans{};
 			for (size_t itr = 0; itr < M; ++itr) {
 				ans[itr] = arr[itr];
 			}
